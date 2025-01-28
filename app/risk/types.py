@@ -21,6 +21,15 @@ class RiskCategory(Enum):
     COLLATERAL = "collateral"
 
 @dataclass
+class CorrelationMetrics:
+    correlation_matrix: Dict[str, Dict[str, float]]
+    beta: float
+    systematic_risk: float
+    idiosyncratic_risk: float
+    tail_dependency: float
+    contagion_risk: float
+
+@dataclass
 class ImpermanentLossMetrics:
     il_ratio: float
     price_impact: float
@@ -114,7 +123,19 @@ class MarketMetrics:
     fully_diluted_valuation: float
     mcap_tvl_ratio: float
     volume_tvl_ratio: float
-    
+
+@dataclass
+class RiskScore:
+    category: RiskCategory
+    score: float
+    level: RiskLevel
+    confidence: float
+    timestamp: datetime
+    factors: Dict[str, float]
+    recommendations: List[str]
+    warning_threshold: float
+    critical_threshold: float
+
 @dataclass
 class ComprehensiveRiskMetrics:
     asset_address: str
@@ -135,26 +156,4 @@ class ComprehensiveRiskMetrics:
     trend_indicators: Dict[str, float]
     last_update: datetime
     data_quality_score: float
-    warning_flags: List[str] 
-
-@dataclass
-class RiskScore:
-    category: RiskCategory
-    score: float
-    level: RiskLevel
-    confidence: float
-    timestamp: datetime
-    factors: Dict[str, float]
-    recommendations: List[str]
-    warning_threshold: float
-    critical_threshold: float
-
-
-@dataclass
-class CorrelationMetrics:
-    correlation_matrix: Dict[str, Dict[str, float]]
-    beta: float
-    systematic_risk: float
-    idiosyncratic_risk: float
-    tail_dependency: float
-    contagion_risk: float
+    warning_flags: List[str]
