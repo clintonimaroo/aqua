@@ -51,7 +51,6 @@ class RiskAnalyzer:
         """Calculate volatility metrics using price history."""
         try:
             if len(price_history) < 2:
-                # Return default values if not enough data
                 return VolatilityMetrics(
                     daily_volatility=0.1,  # 10% daily volatility as default
                     weekly_volatility=0.2,
@@ -62,17 +61,14 @@ class RiskAnalyzer:
                     volatility_spikes=0
                 )
             
-            # Convert to numpy array and calculate returns
             prices = np.array(price_history)
             returns = np.diff(np.log(prices))
             
-            # Calculate volatilities for different time periods
             daily_vol = np.std(returns[-min(len(returns), 1):]) * np.sqrt(365) if len(returns) > 0 else 0.1
             weekly_vol = np.std(returns[-min(len(returns), 7):]) * np.sqrt(52) if len(returns) > 6 else daily_vol * np.sqrt(7)
             monthly_vol = np.std(returns[-min(len(returns), 30):]) * np.sqrt(12) if len(returns) > 29 else weekly_vol * np.sqrt(4)
             annual_vol = np.std(returns) * np.sqrt(365)
             
-            # Calculate volatility trend
             if len(returns) > 14:
                 recent_vol = np.std(returns[-7:])
                 past_vol = np.std(returns[-14:-7])
@@ -84,7 +80,7 @@ class RiskAnalyzer:
             volatility_spikes = self._count_volatility_spikes(returns)
             
             return VolatilityMetrics(
-                daily_volatility=float(max(daily_vol, 0.001)),  # Ensure positive volatility
+                daily_volatility=float(max(daily_vol, 0.001)), 
                 weekly_volatility=float(max(weekly_vol, 0.001)),
                 monthly_volatility=float(max(monthly_vol, 0.001)),
                 annual_volatility=float(max(annual_vol, 0.001)),
@@ -158,11 +154,11 @@ class RiskAnalyzer:
                 hack_history=protocol_data.get("hack_history", []),
                 audit_status=protocol_data.get("audit_status", False),
                 governance_score=float(protocol_data.get("governance_score", 0.5)),
-                insurance_coverage=float(protocol_data.get("insurance_coverage", 1000000)),  # Default $1M coverage
-                timelock_period=int(protocol_data.get("timelock_period", 24)),  # Default 24 hours
-                admin_keys=int(protocol_data.get("admin_keys", 3)),  # Default 3 admin keys
-                upgradeable=protocol_data.get("upgradeable", True),  # Default upgradeable
-                bug_bounty_size=float(protocol_data.get("bug_bounty_size", 100000))  # Default $100k bounty
+                insurance_coverage=float(protocol_data.get("insurance_coverage", 1000000)), 
+                timelock_period=int(protocol_data.get("timelock_period", 24)),  
+                admin_keys=int(protocol_data.get("admin_keys", 3)),  
+                upgradeable=protocol_data.get("upgradeable", True),  
+                bug_bounty_size=float(protocol_data.get("bug_bounty_size", 100000))  
             )
         except Exception as e:
             logger.error(f"Error calculating protocol metrics: {e}")
@@ -173,9 +169,8 @@ class RiskAnalyzer:
         try:
             market_cap = float(market_data.get("market_cap", 0))
             volume_24h = float(market_data.get("volume_24h", 0))
-            tvl = float(market_data.get("total_tvl", 1))  # Default to 1 to avoid division by zero
+            tvl = float(market_data.get("total_tvl", 1))  
             
-            # Calculate ratios
             mcap_tvl_ratio = market_cap / tvl if tvl > 0 else 0
             volume_tvl_ratio = volume_24h / tvl if tvl > 0 else 0
             
@@ -195,10 +190,8 @@ class RiskAnalyzer:
     async def calculate_correlation_metrics(self) -> CorrelationMetrics:
         """Calculate correlation and systematic risk metrics."""
         try:
-            # Get market data from service
             market_data = await self.market_service.get_latest_market_data()
             
-            # Generate sample correlation matrix if no data available
             correlation_matrix = {}
             assets = ["BTC", "ETH", "SOL", "AVAX", "MATIC"]
             for asset in assets:
@@ -207,12 +200,10 @@ class RiskAnalyzer:
                     if asset == other_asset:
                         correlations[other_asset] = 1.0
                     else:
-                        # Generate a random correlation between 0.3 and 0.9
                         correlations[other_asset] = 0.3 + np.random.random() * 0.6
                 correlation_matrix[asset] = correlations
 
-            # Generate reasonable sample metrics if no data available
-            beta = 1.2  # Slightly more volatile than market
+            beta = 1.2 
             systematic_risk = 0.15
             idiosyncratic_risk = 0.08
             tail_dependency = 0.35
@@ -304,11 +295,9 @@ class RiskAnalyzer:
     async def calculate_risk_score(self) -> RiskScore:
         """Calculate overall risk score."""
         try:
-            # Get market data from service
             market_data = await self.market_service.get_latest_market_data()
             
-            # Generate sample risk score if no data available
-            score = 65.0  # Moderate to high risk
+            score = 65.0 
             level = RiskLevel.MODERATE
             confidence = 0.85
             factors = {
@@ -371,17 +360,15 @@ class RiskAnalyzer:
                 
             il = 0
             for token, price_change in price_changes.items():
-                if price_change <= 0:  # Skip invalid price changes
+                if price_change <= 0: 
                     continue
                     
                 weight = weights.get(token, 0)
-                if weight <= 0:  # Skip invalid weights
+                if weight <= 0:
                     continue
                     
-                # Calculate IL using standard formula
                 il += weight * (2 * np.sqrt(price_change) / (1 + price_change) - 1)
             
-            # Ensure non-negative IL ratio
             return max(abs(il), 0.0)
         except Exception as e:
             logger.error(f"Error calculating IL ratio: {e}")
@@ -438,21 +425,17 @@ class RiskAnalyzer:
 
     def _calculate_position_size_limit(self, market_data: Dict) -> float:
         try:
-            liquidity = float(market_data.get("liquidity", market_data.get("total_tvl", 1000000)))  # Default $1M liquidity
-            volume = float(market_data.get("volume_24h", liquidity * 0.1))  # Default 10% of liquidity
+            liquidity = float(market_data.get("liquidity", market_data.get("total_tvl", 1000000)))  
+            volume = float(market_data.get("volume_24h", liquidity * 0.1))  
+            liquidity_based = max(liquidity * 0.01, 100)  
+            volume_based = max(volume * 0.05, 100) 
             
-            # Calculate conservative position size limits
-            liquidity_based = max(liquidity * 0.01, 100)  # At least $100
-            volume_based = max(volume * 0.05, 100)  # At least $100
-            
-            # Take the minimum of the two limits
             position_limit = min(0.1, liquidity_based / liquidity, volume_based / volume)
             
-            # Ensure positive position size limit
-            return max(position_limit, 0.001)  # At least 0.1% position size
+            return max(position_limit, 0.001) 
         except Exception as e:
             logger.error(f"Error calculating position size limit: {e}")
-            return 0.001  # Default to 0.1% position size
+            return 0.001  
 
     def _calculate_step_risk(self, step: Dict, market_data: Dict) -> Dict[str, float]:
         return {
