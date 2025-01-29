@@ -220,4 +220,11 @@ class VectorStoreService:
             logger.error(f"Error performing natural query: {e}")
             raise
 
-VectorService = VectorStoreService()
+# Initialize VectorService variable
+VectorService = None
+
+def get_vector_service():
+    global VectorService
+    if not VectorService:
+        VectorService = VectorStoreService()
+    return VectorService

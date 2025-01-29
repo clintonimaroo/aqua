@@ -1,25 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tests
+tests/
+test_*.py
+
+# Logs
+*.log
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
 *.pyc
 *.pyo
-__pycache__/
-
-venv/
-.venv/
-ENV/
-.env/
-
-.env
 .env.local
 .env.*.local
 .env.test
 .env.production
 
-.idea/
-.vscode/
-
 *.egg
-*.egg-info/
-dist/
-build/
 *.manifest
 *.spec
 

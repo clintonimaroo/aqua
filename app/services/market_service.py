@@ -1,9 +1,12 @@
 import json
 import logging
-from typing import Dict
-from app.services.vector_service import VectorService
+from typing import Dict, List, Optional, Any
+from app.services.vector_service import VectorService, get_vector_service
 from app.providers.defi_llama_provider import get_market_data
 from app.providers.types.market_types import MarketData
+from datetime import datetime, timedelta
+import numpy as np
+from app.utils.time import get_timestamp_range
 
 
 logger = logging.getLogger("MARKET_SERVICE")
@@ -13,6 +16,9 @@ class MarketService:
     """
     Service for managing market data fetching, storage, and retrieval.
     """
+
+    def __init__(self):
+        self.vector_service = get_vector_service()
 
     @staticmethod
     async def validate_market_data(market_data: Dict) -> Dict:
@@ -29,7 +35,6 @@ class MarketService:
             raise ValueError(f"Market data must be a dictionary. Got: {type(market_data)}")
 
         if "timestamp" not in market_data or not isinstance(market_data["timestamp"], str) or not market_data["timestamp"]:
-            from datetime import datetime
             market_data["timestamp"] = datetime.utcnow().isoformat()
 
         if "protocols" in market_data and not isinstance(market_data["protocols"], dict):
